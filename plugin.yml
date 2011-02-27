@@ -1,0 +1,16 @@
+name: Homes
+main: com.guntherdw.bukkit.Homes.Homes
+version: 0.9
+commands:
+    homes:
+        description: Multi-homes plugin
+        usage: /<command> add <alias> | del <alias> | use <alias> | list
+    home:
+        description: Go to your home
+        usage: /<command>
+    sethome:
+        description: Set your home to your current position
+        usage: /<command>
+    reloadhomes:
+        description: Reloads the homes map
+        usage: /<command>

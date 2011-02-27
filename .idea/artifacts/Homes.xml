@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="Homes">
+    <output-path>$PROJECT_DIR$/out/artifacts/Homes</output-path>
+    <root id="archive" name="Homes.jar">
+      <element id="module-output" name="Homes" />
+      <element id="file-copy" path="$PROJECT_DIR$/../TweakcraftUtils/plugin.yml" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
