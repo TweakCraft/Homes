@@ -120,6 +120,30 @@ public class Homes extends JavaPlugin {
         }
     }
 
+    public void reloadHomes(Player p) {
+        try {
+            int count = 0;
+            // homes = new HashMap<String, Home>();
+            Connection conn = getConnection();
+            PreparedStatement st = null;
+            ResultSet rs = null;
+            st = conn.prepareStatement("SELECT name, x, y, z, rotX, rotY, world FROM homes WHERE name = ?");
+            st.setString(1, p.getName());
+            rs = st.executeQuery();
+
+            while (rs.next()) {
+                homes.put(rs.getString(1), new Home(rs.getDouble(2), rs.getDouble(3),
+                        rs.getDouble(4), rs.getFloat(5), rs.getFloat(6), rs.getString(7)));
+                count++;
+            }
+            log.info("[Homes] Loaded " + p.getName() +"'s new home!");
+
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
+
+
     public boolean check(Player player, String permNode) {
         if (perm == null) {
             return true;
@@ -159,8 +183,9 @@ public class Homes extends JavaPlugin {
                         st.setDouble(3, player.getLocation().getX());
                         st.setDouble(4, player.getLocation().getY());
                         st.setDouble(5, player.getLocation().getZ());
-                        st.setFloat(6, player.getLocation().getYaw());
-                        st.setFloat(7, player.getLocation().getPitch());
+                        st.setFloat(6, player.getLocation().getPitch());
+                        st.setFloat(7, player.getLocation().getYaw());
+
                         st.setString(8, name);
                         st.executeUpdate();
 
@@ -239,8 +264,9 @@ public class Homes extends JavaPlugin {
                                 st.setDouble(1, home.getX());
                                 st.setDouble(2, home.getY());
                                 st.setDouble(3, home.getZ());
-                                st.setFloat(4, home.getYaw());
-                                st.setFloat(5, home.getPitch());
+
+                                st.setFloat(5, home.getYaw());
+                                st.setFloat(4, home.getPitch());
                                 st.setString(6, home.getWorld());
                                 st.setString(7, player.getName());
 
@@ -250,7 +276,7 @@ public class Homes extends JavaPlugin {
                                 } else {
                                     player.sendMessage(ChatColor.GREEN + "Home '" + rs.getString(1) + "' loaded. It's your /home now!");
                                     log.info("[Homes] "+player.getName()+" set his home to '"+name+"'!");
-                                    reloadHomes();
+                                    reloadHomes(player);
                                 }
                             } else {
                                 String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: " + rs.getString(1);
@@ -322,6 +348,7 @@ public class Homes extends JavaPlugin {
                 Home home = new Home(player.getLocation().getX(),
                                      player.getLocation().getY(),
                                      player.getLocation().getZ(),
+
                                      player.getLocation().getPitch(),
                                      player.getLocation().getYaw(),
                                      player.getLocation().getWorld().getName()
@@ -338,13 +365,14 @@ public class Homes extends JavaPlugin {
                 st.setDouble(1, home.getX());
                 st.setDouble(2, home.getY());
                 st.setDouble(3, home.getZ());
-                st.setFloat(5, home.getPitch());
-                st.setFloat(4, home.getYaw());
+                st.setFloat(5, home.getYaw());
+                st.setFloat(4, home.getPitch());
                 st.setString(6, home.getWorld());
                 st.setString(7, player.getName());
                 st.executeUpdate();
                 // player.sendMessage("INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
                 player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
+                homes.put(player.getName(), home);
                 log.info("[Homes] "+player.getName()+" set his home!");
                 /* rs = st.executeUpdate();
                 if(!=1) {
@@ -373,7 +401,8 @@ public class Homes extends JavaPlugin {
                 if(homes.containsKey(playername)) {
                     Home h = homes.get(playername);
                     Location loc = new Location(getServer().getWorld(h.getWorld()),
-                            h.getX(), h.getY(), h.getZ(), h.getYaw(), h.getPitch());
+                            h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
+                    // this.getServer().getWorld(h.getWorld()).
                     player.teleportTo(loc);
                 } else {
                     if(bo)
@@ -387,37 +416,6 @@ public class Homes extends JavaPlugin {
                     }
                 }
                 return true;
-                /* PreparedStatement st = null;
-                ResultSet rs = null;
-                // st = conn.prepareStatement("SELECT x, y, z, rotX, rotY, world FROM homes WHERE name LIKE ?");
-                if(strings.length!=0 && check(player, "tweakcraft.homesother"))
-                {
-                    bo=true;
-                    st.setString(1, "%"+strings[0]+"%");
-                } else {
-                    st.setString(1, player.getName());
-                }
-                rs = st.executeQuery();
-                if(rs.next())
-                {
-                    log.info("Teleporting "+player.getName() + " to " + rs.getDouble(1));
-                    if(bo) log.info("Teleporting to player " + strings[0]);
-                    Home home = new Home(rs.getDouble(1), rs.getDouble(2) + 1, rs.getDouble(3), rs.getFloat(4), rs.getFloat(5), rs.getString(6));
-                    Location loc = new Location(this.getServer().getWorld(home.getWorld()), home.getX(), home.getY(), home.getZ(), home.getPitch(), home.getYaw());
-                    player.teleportTo(loc);
-                } else {
-                    if(!bo)
-                        player.sendMessage(ChatColor.GOLD + "Can't find your home!");
-                    else
-                        player.sendMessage(ChatColor.GOLD + "Can't find that player's home!");
-                }
-                return true;
-            } catch (SQLException e) {
-                player.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
-                log.warning ("[TweakHomes] home warning : "+e.getMessage());
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            } */
-            // }
         } else if(command.getName().equalsIgnoreCase("reloadhomes") &&
                     check(player, "homes.homesother")) {
                 player.sendMessage(ChatColor.GREEN + "Reloading homes map!");
