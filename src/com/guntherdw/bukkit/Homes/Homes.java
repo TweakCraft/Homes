@@ -69,7 +69,26 @@ public class Homes extends JavaPlugin {
         }
     }
 
+    public void initConfig()
+    {
+        try{
+            getConfiguration().setProperty("database", "databasename");
+            getConfiguration().setProperty("username", "database-username");
+            getConfiguration().setProperty("password", "database-password");
+        } catch (Throwable e)
+        {
+            log.severe("[Homes] There was an exception while we were saving the config, be sure to doublecheck!");
+        }
+    }
+
     public void onEnable() {
+        if(getConfiguration() == null)
+        {
+            log.severe("[Homes] You have to configure me now, reboot the server after you're done!");
+            getDataFolder().mkdirs();
+            initConfig();
+            this.setEnabled(false);
+        }
         PluginDescriptionFile pdfFile = this.getDescription();
         loadDriver();
         setupConnection();
