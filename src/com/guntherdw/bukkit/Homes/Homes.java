@@ -172,8 +172,11 @@ public class Homes extends JavaPlugin {
     }
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        Player player = (Player) commandSender;
+        // Player player = (Player) commandSender;
         if (command.getName().equalsIgnoreCase("homes")) {
+            if(commandSender instanceof Player)
+            {
+                Player player = (Player) commandSender;
             String name = "";
             if (strings.length >= 2) {
                 for (int i = 1; i < strings.length; i++)
@@ -278,7 +281,7 @@ public class Homes extends JavaPlugin {
 
                         if (rs.next()) {
                             if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
-                                Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(5), rs.getFloat(6), rs.getString(7));
+                                Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(6), rs.getFloat(5), rs.getString(7));
                                 st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
                                 st.setDouble(1, home.getX());
                                 st.setDouble(2, home.getY());
@@ -358,9 +361,16 @@ public class Homes extends JavaPlugin {
             } else {
                 player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list");
             }
+            } else {
+                commandSender.sendMessage("You need to be a player to control your homes!");
+            }
             return true;
         } else if (command.getName().equalsIgnoreCase("sethome")) {
             try {
+                if(commandSender instanceof Player)
+                {
+                    Player player = (Player) commandSender;
+
                 Connection conn = getConnection();
                 PreparedStatement st = null;
                 ResultSet rs = null;
@@ -401,13 +411,19 @@ public class Homes extends JavaPlugin {
                     player.sendMessage(ChatColor.RED + "There was an error setting your home!");
                     player.sendMessage(st.getWarnings());
                 } */
+                    } else {
+                    commandSender.sendMessage("You need to be a plyer to set your home!");
+                }
             } catch (SQLException e) {
-                player.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
+                commandSender.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             return true;
         } else if (command.getName().equalsIgnoreCase("home")) {
             // try{
+            if(commandSender instanceof Player)
+                {
+                    Player player = (Player) commandSender;
                 boolean bo=false;
                 String playername = "";
                 if(strings.length!=0 && check(player, "homes.homesother"))
@@ -434,11 +450,22 @@ public class Homes extends JavaPlugin {
                         player.sendMessage(ChatColor.DARK_AQUA + "Can't find your home!");
                     }
                 }
+                } else {
+                commandSender.sendMessage("You need to be a player to go home!");
+            }
                 return true;
-        } else if(command.getName().equalsIgnoreCase("reloadhomes") &&
-                    check(player, "homes.homesother")) {
-                player.sendMessage(ChatColor.GREEN + "Reloading homes map!");
-            log.info("[Homes] "+player.getName()+" issued /reloadhomes!");
+        } else if(command.getName().equalsIgnoreCase("reloadhomes")) {
+            if(commandSender instanceof Player)
+            {
+                Player player = (Player) commandSender;
+                if(!check(player, "homes.homesother"))
+                    return true;
+                log.info("[Homes] "+player.getName()+" issued /reloadhomes!");
+            } else {
+                log.info("[Homes] console issued /reloadhomes!");
+            }
+                commandSender.sendMessage(ChatColor.GREEN + "Reloading homes map!");
+
                 setupConnection();
                 reloadHomes();
                 return true;
