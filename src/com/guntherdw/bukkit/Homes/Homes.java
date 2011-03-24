@@ -438,7 +438,7 @@ public class Homes extends JavaPlugin {
                     Location loc = new Location(getServer().getWorld(h.getWorld()),
                             h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
                     // this.getServer().getWorld(h.getWorld()).
-                    player.teleportTo(loc);
+                    player.teleport(loc);
                 } else {
                     if(bo)
                     {
