@@ -107,16 +107,6 @@ public class Homes extends JavaPlugin {
         }
     }
 
-    /* public String searchHome(String homename)
-    {
-        for(String s : homes.keySet())
-        {
-            if(s.equalsIgnoreCase(warpname));
-            return s;
-        }
-        return null;
-    } */
-
     public void reloadHomes() {
         try {
             int count = 0;
@@ -177,190 +167,196 @@ public class Homes extends JavaPlugin {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
-            String name = "";
-            if (strings.length >= 2) {
-                for (int i = 1; i < strings.length; i++)
-                    name += strings[i] + " ";
-                    name = name.trim();
-            }
-
-            String nameEscaped = name.replaceAll("%", "\\%").replaceAll("_", "\\_");
-
-            if (strings.length >= 2 && name.length() > 0) {
-                Connection conn = getConnection();
-                if (strings[0].equalsIgnoreCase("add")) {
-                    PreparedStatement st = null;
-                    try {
-                        // Delete before inserting
-                        st = conn.prepareStatement("DELETE FROM savehomes WHERE name = ? AND description = ?");
-                        st.setString(1, player.getName());
-                        st.setString(2, name);
-                        st.executeUpdate();
-                        st.close();
-
-                        // Insert
-                        st = conn.prepareStatement("INSERT INTO savehomes (name, world, x, y, z, rotX, rotY, description) VALUES (?,?,?,?,?,?,?,?)");
-                        st.setString(1, player.getName());
-                        st.setString(2, player.getLocation().getWorld().getName());
-                        st.setDouble(3, player.getLocation().getX());
-                        st.setDouble(4, player.getLocation().getY());
-                        st.setDouble(5, player.getLocation().getZ());
-                        st.setFloat(6, player.getLocation().getPitch());
-                        st.setFloat(7, player.getLocation().getYaw());
-
-                        st.setString(8, name);
-                        st.executeUpdate();
-
-                        player.sendMessage(ChatColor.GREEN + "Home '" + name + "' saved.");
-                        log.info("[Homes] "+player.getName()+" saved a home! '"+name+"'");
-                    } catch (Exception e) {
-                        log.info("homes: Error saving '" + name + "' of player '" + player.getName() + "' error: ");
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (conn != null)
-                                conn.close();
-                            if (st != null)
-                                st.close();
-                        } catch (Exception e) {
-                        }
+                if(!check(player, "homes.homes"))
+                {
+                    player.sendMessage("You don't have permission to use homes!");
+                } else {
+                    String name = "";
+                    if (strings.length >= 2) {
+                        for (int i = 1; i < strings.length; i++)
+                            name += strings[i] + " ";
+                            name = name.trim();
                     }
-                } else if (strings[0].equalsIgnoreCase("del")) {
-                    PreparedStatement st = null;
-                    ResultSet rs = null;
-                    try {
-                        st = conn.prepareStatement("SELECT description FROM savehomes WHERE name = ? AND description LIKE ? ORDER BY description");
-                        st.setString(1, player.getName());
-                        st.setString(2, nameEscaped + "%");
-                        rs = st.executeQuery();
 
-                        if (rs.next()) {
-                            if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
-                                name = rs.getString(1);
-                                rs.close();
-                                st.close();
+                    String nameEscaped = name.replaceAll("%", "\\%").replaceAll("_", "\\_");
 
+                    if (strings.length >= 2 && name.length() > 0) {
+                        Connection conn = getConnection();
+                        if (strings[0].equalsIgnoreCase("add")) {
+                            PreparedStatement st = null;
+                            try {
+                                // Delete before inserting
                                 st = conn.prepareStatement("DELETE FROM savehomes WHERE name = ? AND description = ?");
                                 st.setString(1, player.getName());
                                 st.setString(2, name);
                                 st.executeUpdate();
-
-                                player.sendMessage(ChatColor.GREEN + "Home '" + name + "' deleted.");
-                            } else {
-
-                                String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: " + rs.getString(1);
-                                while (rs.next())
-                                    msg += ", " + rs.getString(1);
-
-                                player.sendMessage(msg);
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + name);
-                            log.info("[Homes] "+player.getName()+" deleted his '"+name+"' home!");
-                        }
-                    } catch (Exception e) {
-                        log.info("homes: Error deleting '" + name + "' of player '" + player.getName() + "' error: ");
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (st != null)
                                 st.close();
-                            if (rs != null)
-                                rs.close();
-                        } catch (Exception e) {
-                        }
-                    }
-                } else if (strings[0].equalsIgnoreCase("use")) {
-                    PreparedStatement st = null;
-                    ResultSet rs = null;
-                    try {
-                        st = conn.prepareStatement("SELECT description, x, y, z, rotX, rotY, world FROM savehomes WHERE name = ? AND description LIKE ? ORDER BY description");
-                        st.setString(1, player.getName());
-                        st.setString(2, nameEscaped + "%");
-                        rs = st.executeQuery();
 
-                        if (rs.next()) {
-                            if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
-                                Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(6), rs.getFloat(5), rs.getString(7));
-                                st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
-                                st.setDouble(1, home.getX());
-                                st.setDouble(2, home.getY());
-                                st.setDouble(3, home.getZ());
+                                // Insert
+                                st = conn.prepareStatement("INSERT INTO savehomes (name, world, x, y, z, rotX, rotY, description) VALUES (?,?,?,?,?,?,?,?)");
+                                st.setString(1, player.getName());
+                                st.setString(2, player.getLocation().getWorld().getName());
+                                st.setDouble(3, player.getLocation().getX());
+                                st.setDouble(4, player.getLocation().getY());
+                                st.setDouble(5, player.getLocation().getZ());
+                                st.setFloat(6, player.getLocation().getPitch());
+                                st.setFloat(7, player.getLocation().getYaw());
 
-                                st.setFloat(5, home.getYaw());
-                                st.setFloat(4, home.getPitch());
-                                st.setString(6, home.getWorld());
-                                st.setString(7, player.getName());
+                                st.setString(8, name);
+                                st.executeUpdate();
 
-                                if(st.executeUpdate()==0)
-                                {
-                                    player.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
-                                } else {
-                                    player.sendMessage(ChatColor.GREEN + "Home '" + rs.getString(1) + "' loaded. It's your /home now!");
-                                    log.info("[Homes] "+player.getName()+" set his home to '"+name+"'!");
-                                    reloadHomes(player);
+                                player.sendMessage(ChatColor.GREEN + "Home '" + name + "' saved.");
+                                log.info("[Homes] "+player.getName()+" saved a home! '"+name+"'");
+                            } catch (Exception e) {
+                                log.info("homes: Error saving '" + name + "' of player '" + player.getName() + "' error: ");
+                                e.printStackTrace();
+                            } finally {
+                                try {
+                                    if (conn != null)
+                                        conn.close();
+                                    if (st != null)
+                                        st.close();
+                                } catch (Exception e) {
                                 }
-                            } else {
-                                String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: " + rs.getString(1);
+                            }
+                        } else if (strings[0].equalsIgnoreCase("del")) {
+                            PreparedStatement st = null;
+                            ResultSet rs = null;
+                            try {
+                                st = conn.prepareStatement("SELECT description FROM savehomes WHERE name = ? AND description LIKE ? ORDER BY description");
+                                st.setString(1, player.getName());
+                                st.setString(2, nameEscaped + "%");
+                                rs = st.executeQuery();
+
+                                if (rs.next()) {
+                                    if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
+                                        name = rs.getString(1);
+                                        rs.close();
+                                        st.close();
+
+                                        st = conn.prepareStatement("DELETE FROM savehomes WHERE name = ? AND description = ?");
+                                        st.setString(1, player.getName());
+                                        st.setString(2, name);
+                                        st.executeUpdate();
+
+                                        player.sendMessage(ChatColor.GREEN + "Home '" + name + "' deleted.");
+                                    } else {
+
+                                        String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: " + rs.getString(1);
+                                        while (rs.next())
+                                            msg += ", " + rs.getString(1);
+
+                                        player.sendMessage(msg);
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + name);
+                                    log.info("[Homes] "+player.getName()+" deleted his '"+name+"' home!");
+                                }
+                            } catch (Exception e) {
+                                log.info("homes: Error deleting '" + name + "' of player '" + player.getName() + "' error: ");
+                                e.printStackTrace();
+                            } finally {
+                                try {
+                                    if (st != null)
+                                        st.close();
+                                    if (rs != null)
+                                        rs.close();
+                                } catch (Exception e) {
+                                }
+                            }
+                        } else if (strings[0].equalsIgnoreCase("use")) {
+                            PreparedStatement st = null;
+                            ResultSet rs = null;
+                            try {
+                                st = conn.prepareStatement("SELECT description, x, y, z, rotX, rotY, world FROM savehomes WHERE name = ? AND description LIKE ? ORDER BY description");
+                                st.setString(1, player.getName());
+                                st.setString(2, nameEscaped + "%");
+                                rs = st.executeQuery();
+
+                                if (rs.next()) {
+                                    if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
+                                        Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(6), rs.getFloat(5), rs.getString(7));
+                                        st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
+                                        st.setDouble(1, home.getX());
+                                        st.setDouble(2, home.getY());
+                                        st.setDouble(3, home.getZ());
+
+                                        st.setFloat(5, home.getYaw());
+                                        st.setFloat(4, home.getPitch());
+                                        st.setString(6, home.getWorld());
+                                        st.setString(7, player.getName());
+
+                                        if(st.executeUpdate()==0)
+                                        {
+                                            player.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
+                                        } else {
+                                            player.sendMessage(ChatColor.GREEN + "Home '" + rs.getString(1) + "' loaded. It's your /home now!");
+                                            log.info("[Homes] "+player.getName()+" set his home to '"+name+"'!");
+                                            reloadHomes(player);
+                                        }
+                                    } else {
+                                        String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: " + rs.getString(1);
+                                        while (rs.next())
+                                            msg += ", " + rs.getString(1);
+
+                                        player.sendMessage(msg);
+                                        log.info("[Homes] "+player.getName()+" tried to set his home to '"+name+"' and got a list!");
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + name);
+                                    log.info("[Homes] "+player.getName()+" tried to set his home to '"+name+"' but failed!");
+                                }
+                            } catch (Exception e) {
+                                log.info("homes: Error using '" + name + "' of player '" + player.getName() + "' error: ");
+                                e.printStackTrace();
+                            } finally {
+                                try {
+                                    if (st != null)
+                                        st.close();
+                                    if (rs != null)
+                                        rs.close();
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                    } else if (strings.length == 1 && strings[0].equalsIgnoreCase("list")) {
+                        Connection conn = getConnection();
+                        PreparedStatement st = null;
+                        ResultSet rs = null;
+                        try {
+                            st = conn.prepareStatement("SELECT description FROM savehomes WHERE name = ? ORDER BY description");
+                            st.setString(1, player.getName());
+                            rs = st.executeQuery();
+
+                            String msg = ChatColor.GREEN.toString();
+                            if (rs.next()) {
+                                msg += "Your homes: " + ChatColor.WHITE + rs.getString(1);
+
                                 while (rs.next())
                                     msg += ", " + rs.getString(1);
 
-                                player.sendMessage(msg);
-                                log.info("[Homes] "+player.getName()+" tried to set his home to '"+name+"' and got a list!");
+                            } else {
+                                msg += "No homes found";
                             }
-                        } else {
-                            player.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + name);
-                            log.info("[Homes] "+player.getName()+" tried to set his home to '"+name+"' but failed!");
-                        }
-                    } catch (Exception e) {
-                        log.info("homes: Error using '" + name + "' of player '" + player.getName() + "' error: ");
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (st != null)
-                                st.close();
-                            if (rs != null)
-                                rs.close();
+                            player.sendMessage(msg);
+                            log.info("[Homes] "+player.getName()+" listed his homes!");
                         } catch (Exception e) {
+                            log.info("homes: Error listing homes of player '" + player.getName() + "' error: ");
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (st != null)
+                                    st.close();
+                                if (rs != null)
+                                    rs.close();
+                            } catch (Exception e) {
+
+                            }
                         }
-                    }
-                }
-            } else if (strings.length == 1 && strings[0].equalsIgnoreCase("list")) {
-                Connection conn = getConnection();
-                PreparedStatement st = null;
-                ResultSet rs = null;
-                try {
-                    st = conn.prepareStatement("SELECT description FROM savehomes WHERE name = ? ORDER BY description");
-                    st.setString(1, player.getName());
-                    rs = st.executeQuery();
-
-                    String msg = ChatColor.GREEN.toString();
-                    if (rs.next()) {
-                        msg += "Your homes: " + ChatColor.WHITE + rs.getString(1);
-
-                        while (rs.next())
-                            msg += ", " + rs.getString(1);
-
                     } else {
-                        msg += "No homes found";
-                    }
-                    player.sendMessage(msg);
-                    log.info("[Homes] "+player.getName()+" listed his homes!");
-                } catch (Exception e) {
-                    log.info("homes: Error listing homes of player '" + player.getName() + "' error: ");
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (st != null)
-                            st.close();
-                        if (rs != null)
-                            rs.close();
-                    } catch (Exception e) {
+                        player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list");
                     }
                 }
-            } else {
-                player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list");
-            }
             } else {
                 commandSender.sendMessage("You need to be a player to control your homes!");
             }
@@ -371,47 +367,52 @@ public class Homes extends JavaPlugin {
                 {
                     Player player = (Player) commandSender;
 
-                Connection conn = getConnection();
-                PreparedStatement st = null;
-                ResultSet rs = null;
-                Home home = new Home(player.getLocation().getX(),
-                                     player.getLocation().getY(),
-                                     player.getLocation().getZ(),
+                    if(check(player, "homes.sethome"))
+                    {
+                        Connection conn = getConnection();
+                        PreparedStatement st = null;
+                        ResultSet rs = null;
+                        Home home = new Home(player.getLocation().getX(),
+                                             player.getLocation().getY(),
+                                             player.getLocation().getZ(),
 
-                                     player.getLocation().getPitch(),
-                                     player.getLocation().getYaw(),
-                                     player.getLocation().getWorld().getName()
-                );
-                st = conn.prepareStatement("SELECT name FROM homes WHERE name = ?");
-                st.setString(1, player.getName());
-                rs = st.executeQuery();
-                if(rs.next())
-                {
-                    st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
-                } else {
-                    st = conn.prepareStatement("INSERT INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
-                }
-                st.setDouble(1, home.getX());
-                st.setDouble(2, home.getY());
-                st.setDouble(3, home.getZ());
-                st.setFloat(5, home.getYaw());
-                st.setFloat(4, home.getPitch());
-                st.setString(6, home.getWorld());
-                st.setString(7, player.getName());
-                st.executeUpdate();
-                // player.sendMessage("INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
-                player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
-                homes.put(player.getName(), home);
-                log.info("[Homes] "+player.getName()+" set his home!");
-                /* rs = st.executeUpdate();
-                if(!=1) {
-                    player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
-                } else {
-                    log.severe ("[TweakHomes] sethome warning : "+st.getWarnings());
-                    player.sendMessage(ChatColor.RED + "There was an error setting your home!");
-                    player.sendMessage(st.getWarnings());
-                } */
+                                             player.getLocation().getPitch(),
+                                             player.getLocation().getYaw(),
+                                             player.getLocation().getWorld().getName()
+                        );
+                        st = conn.prepareStatement("SELECT name FROM homes WHERE name = ?");
+                        st.setString(1, player.getName());
+                        rs = st.executeQuery();
+                        if(rs.next())
+                        {
+                            st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
+                        } else {
+                            st = conn.prepareStatement("INSERT INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
+                        }
+                        st.setDouble(1, home.getX());
+                        st.setDouble(2, home.getY());
+                        st.setDouble(3, home.getZ());
+                        st.setFloat(5, home.getYaw());
+                        st.setFloat(4, home.getPitch());
+                        st.setString(6, home.getWorld());
+                        st.setString(7, player.getName());
+                        st.executeUpdate();
+                        // player.sendMessage("INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
+                        player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
+                        homes.put(player.getName(), home);
+                        log.info("[Homes] "+player.getName()+" set his home!");
+                        /* rs = st.executeUpdate();
+                        if(!=1) {
+                            player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
+                        } else {
+                            log.severe ("[TweakHomes] sethome warning : "+st.getWarnings());
+                            player.sendMessage(ChatColor.RED + "There was an error setting your home!");
+                            player.sendMessage(st.getWarnings());
+                        } */
                     } else {
+                        player.sendMessage("You don't have permission to use /sethome!");   
+                    }
+                } else {
                     commandSender.sendMessage("You need to be a plyer to set your home!");
                 }
             } catch (SQLException e) {
@@ -422,38 +423,42 @@ public class Homes extends JavaPlugin {
         } else if (command.getName().equalsIgnoreCase("home")) {
             // try{
             if(commandSender instanceof Player)
+            {
+                Player player = (Player) commandSender;
+                if(check(player, "homes.home"))
                 {
-                    Player player = (Player) commandSender;
-                boolean bo=false;
-                String playername = "";
-                if(strings.length!=0 && check(player, "homes.homesother"))
-                {
-                    bo=true;
-                    playername = strings[0];
-                } else {
-                    playername = player.getName();
-                }
-                if(homes.containsKey(playername)) {
-                    Home h = homes.get(playername);
-                    Location loc = new Location(getServer().getWorld(h.getWorld()),
-                            h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
-                    // this.getServer().getWorld(h.getWorld()).
-                    player.teleport(loc);
-                } else {
-                    if(bo)
+                    boolean bo=false;
+                    String playername = "";
+                    if(strings.length!=0 && check(player, "homes.homesother"))
                     {
-                        player.sendMessage(ChatColor.DARK_AQUA + "Can't find that player's home!");
-                        log.info("[Homes] "+player.getName()+" tried to go to "+playername+"'s home!");
+                        bo=true;
+                        playername = strings[0];
+                    } else {
+                        playername = player.getName();
                     }
-                    else{
-                        log.info("[Homes] "+player.getName()+" went home!");
-                        player.sendMessage(ChatColor.DARK_AQUA + "Can't find your home!");
+                    if(homes.containsKey(playername)) {
+                        Home h = homes.get(playername);
+                        Location loc = new Location(getServer().getWorld(h.getWorld()),
+                                h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
+                        player.teleport(loc);
+                    } else {
+                        if(bo)
+                        {
+                            player.sendMessage(ChatColor.DARK_AQUA + "Can't find that player's home!");
+                            log.info("[Homes] "+player.getName()+" tried to go to "+playername+"'s home!");
+                        }
+                        else{
+                            log.info("[Homes] "+player.getName()+" went home!");
+                            player.sendMessage(ChatColor.DARK_AQUA + "Can't find your home!");
+                        }
                     }
-                }
                 } else {
+                    player.sendMessage("You don't have permission to use /home!");
+                }
+            } else {
                 commandSender.sendMessage("You need to be a player to go home!");
             }
-                return true;
+            return true;
         } else if(command.getName().equalsIgnoreCase("reloadhomes")) {
             if(commandSender instanceof Player)
             {
