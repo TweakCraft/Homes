@@ -261,7 +261,7 @@ public class Homes extends JavaPlugin {
 
                                 if (rs.next()) {
                                     if (rs.isLast() || rs.getString(1).equalsIgnoreCase(name)) {
-                                        Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(6), rs.getFloat(5), rs.getString(7));
+                                        Home home = new Home(rs.getDouble(2), rs.getDouble(3) + 1, rs.getDouble(4), rs.getFloat(5), rs.getFloat(6), rs.getString(7));
                                         st = conn.prepareStatement("UPDATE homes SET x = ?, y = ?, z = ?, rotX = ?, rotY = ?, world = ? WHERE name = ?");
                                         st.setDouble(1, home.getX());
                                         st.setDouble(2, home.getY());

@@ -65,4 +65,8 @@ public class Home {
         Pitch = pitch; // roty
         World = world;
     }
+
+    public String toString() {
+        return "Home{x:"+this.X+",y:"+this.Y+",z:"+this.Z+",Yaw:"+this.Yaw+",Pitch:"+this.Pitch+",World:"+this.World+"}";
+    }
 }
