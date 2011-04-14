@@ -24,28 +24,13 @@ public class Homes extends JavaPlugin {
     public void onDisable() {
         //To change body of implemented methods use File | Settings | File Templates.
         PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("["+pdfFile.getName() + "] version " + pdfFile.getVersion() + " is disabled!");
+        log.info("["+pdfFile.getName() + "] Homes version " + pdfFile.getVersion() + " is disabled!");
     }
 
     public void setupConnection() {
         this.db =  getConfiguration().getString("database");
         this.user = getConfiguration().getString("username");
         this.pass = getConfiguration().getString("password");
-
-        /* try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            String url = "jdbc:mysql://localhost:3306/" + db;
-            conn = DriverManager.getConnection(url, user, pass);
-            this.reloadHomes();
-        } catch (ClassNotFoundException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (InstantiationException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalAccessException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (SQLException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } */
     }
 
     private void loadDriver() {
@@ -94,7 +79,7 @@ public class Homes extends JavaPlugin {
         setupConnection();
         reloadHomes();
         this.setupPermissions();
-        log.info("["+pdfFile.getName() + "] version " + pdfFile.getVersion() + " is enabled!");
+        log.info("["+pdfFile.getName() + "] Homes version " + pdfFile.getVersion() + " is enabled!");
     }
 
     public void setupPermissions() {
@@ -199,8 +184,9 @@ public class Homes extends JavaPlugin {
                                 st.setDouble(3, player.getLocation().getX());
                                 st.setDouble(4, player.getLocation().getY());
                                 st.setDouble(5, player.getLocation().getZ());
-                                st.setFloat(6, player.getLocation().getPitch());
-                                st.setFloat(7, player.getLocation().getYaw());
+
+                                st.setFloat(6, player.getLocation().getYaw());
+                                st.setFloat(7, player.getLocation().getPitch());
 
                                 st.setString(8, name);
                                 st.executeUpdate();
@@ -281,8 +267,9 @@ public class Homes extends JavaPlugin {
                                         st.setDouble(2, home.getY());
                                         st.setDouble(3, home.getZ());
 
-                                        st.setFloat(5, home.getYaw());
-                                        st.setFloat(4, home.getPitch());
+                                        st.setFloat(4, home.getYaw());
+                                        st.setFloat(5, home.getPitch());
+
                                         st.setString(6, home.getWorld());
                                         st.setString(7, player.getName());
 
@@ -376,8 +363,9 @@ public class Homes extends JavaPlugin {
                                              player.getLocation().getY(),
                                              player.getLocation().getZ(),
 
-                                             player.getLocation().getPitch(),
                                              player.getLocation().getYaw(),
+                                             player.getLocation().getPitch(),
+                                
                                              player.getLocation().getWorld().getName()
                         );
                         st = conn.prepareStatement("SELECT name FROM homes WHERE name = ?");
@@ -392,8 +380,10 @@ public class Homes extends JavaPlugin {
                         st.setDouble(1, home.getX());
                         st.setDouble(2, home.getY());
                         st.setDouble(3, home.getZ());
-                        st.setFloat(5, home.getYaw());
-                        st.setFloat(4, home.getPitch());
+
+                        st.setFloat(4, home.getYaw());
+                        st.setFloat(5, home.getPitch());
+
                         st.setString(6, home.getWorld());
                         st.setString(7, player.getName());
                         st.executeUpdate();

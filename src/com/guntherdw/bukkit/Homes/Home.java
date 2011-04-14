@@ -56,13 +56,13 @@ public class Home {
         Yaw = yaw;
     }
 
-    public Home(double x, double y, double z, float pitch, float yaw, String world) {
+    public Home(double x, double y, double z, float yaw, float pitch, String world) {
 
         X = x;
         Y = y;
         Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
+        Yaw = yaw;     // rotx
+        Pitch = pitch; // roty
         World = world;
     }
 }
