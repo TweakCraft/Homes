@@ -4,7 +4,7 @@ version: 1.1
 commands:
     homes:
         description: Multi-homes plugin
-        usage: /<command> add <alias> | del <alias> | use <alias> | list
+        usage: /<command> add <alias> | del <alias> | use <alias> | list | tpback
         _permission: homes.homes
     home:
         description: Go to your home
