@@ -10,13 +10,15 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class Homes extends JavaPlugin {
     private final static Logger log = Logger.getLogger("Minecraft");
-    private String db, user, pass;
+    private String db, user, pass, dbhost;
     // private static Connection conn;
     public static Permissions perm = null;
     public Map<String, Home> homes;
@@ -28,6 +30,7 @@ public class Homes extends JavaPlugin {
     }
 
     public void setupConnection() {
+        this.dbhost = getConfiguration().getString("dbhost");
         this.db =  getConfiguration().getString("database");
         this.user = getConfiguration().getString("username");
         this.pass = getConfiguration().getString("password");
@@ -46,7 +49,7 @@ public class Homes extends JavaPlugin {
     private Connection getConnection()
     {
         try {
-            String url = "jdbc:mysql://localhost:3306/" + db;
+            String url = "jdbc:mysql://"+dbhost+":3306/" + db;
             return DriverManager.getConnection(url + "?autoReconnect=true&user=" + user + "&password=" + pass);
         } catch (SQLException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
@@ -403,7 +406,7 @@ public class Homes extends JavaPlugin {
                         player.sendMessage("You don't have permission to use /sethome!");   
                     }
                 } else {
-                    commandSender.sendMessage("You need to be a plyer to set your home!");
+                    commandSender.sendMessage("You need to be a player to set your home!");
                 }
             } catch (SQLException e) {
                 commandSender.sendMessage(ChatColor.RED + "Something went wrong, contact an admin!");
