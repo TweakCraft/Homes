@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../Bukkit/target/bukkit-0.0.1-SNAPSHOT.jar!/" />
       <root url="jar://$USER_HOME$/Bukkit/plugins/Permissions.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../TweakcraftUtils/out/artifacts/TweakcraftUtils/TweakcraftUtils.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

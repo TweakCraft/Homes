@@ -1,6 +1,6 @@
 name: Homes
 main: com.guntherdw.bukkit.Homes.Homes
-version: 1.0
+version: 1.1
 commands:
     homes:
         description: Multi-homes plugin

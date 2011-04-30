@@ -1,5 +1,6 @@
 package com.guntherdw.bukkit.Homes;
 
+import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -22,6 +23,8 @@ public class Homes extends JavaPlugin {
     // private static Connection conn;
     public static Permissions perm = null;
     public Map<String, Home> homes;
+    public List<String> savehomesTCUtils;
+    public TweakcraftUtils tweakcraftutils;
 
     public void onDisable() {
         //To change body of implemented methods use File | Settings | File Templates.
@@ -77,11 +80,13 @@ public class Homes extends JavaPlugin {
             initConfig();
             this.setEnabled(false);
         }
+        savehomesTCUtils = new ArrayList<String>();
         PluginDescriptionFile pdfFile = this.getDescription();
         loadDriver();
         setupConnection();
         reloadHomes();
         this.setupPermissions();
+        this.setupTCUtils();
         log.info("["+pdfFile.getName() + "] Homes version " + pdfFile.getVersion() + " is enabled!");
     }
 
@@ -94,6 +99,17 @@ public class Homes extends JavaPlugin {
             }
         }
     }
+    
+    public void setupTCUtils() {
+        Plugin plugin = this.getServer().getPluginManager().getPlugin("TweakcraftUtils");
+
+        if (tweakcraftutils == null) {
+            if (plugin != null) {
+                tweakcraftutils = (TweakcraftUtils) plugin;
+            }
+        }
+    }
+
 
     public void reloadHomes() {
         try {
@@ -343,8 +359,16 @@ public class Homes extends JavaPlugin {
 
                             }
                         }
+                    } else if(strings.length == 1 && strings[0].equalsIgnoreCase("tpback")) {
+                        if(savehomesTCUtils.contains(player.getName())) {
+                            savehomesTCUtils.remove(player.getName());
+                            player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
+                        } else {
+                            savehomesTCUtils.add(player.getName());
+                            player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
+                        }
                     } else {
-                        player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list");
+                        player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list | tpback");
                     }
                 }
             } else {
@@ -433,6 +457,11 @@ public class Homes extends JavaPlugin {
                         Home h = homes.get(playername);
                         Location loc = new Location(getServer().getWorld(h.getWorld()),
                                 h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
+                        if(tweakcraftutils != null) {
+                            if(savehomesTCUtils.contains(player.getName())) {
+                                tweakcraftutils.getTelehistory().addHistory(player.getName(), player.getLocation());
+                            }
+                        }
                         player.teleport(loc);
                     } else {
                         if(bo)
