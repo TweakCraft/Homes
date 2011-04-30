@@ -161,7 +161,8 @@ public class Homes extends JavaPlugin {
         if (perm == null) {
             return true;
         } else {
-            return perm.Security.permission(player, permNode);
+            return player.isOp() ||
+                    perm.Security.permission(player, permNode);
         }
     }
 
@@ -360,15 +361,19 @@ public class Homes extends JavaPlugin {
                             }
                         }
                     } else if(strings.length == 1 && strings[0].equalsIgnoreCase("tpback")) {
-                        if(savehomesTCUtils.contains(player.getName())) {
-                            savehomesTCUtils.remove(player.getName());
-                            player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
+                        if(check(player, "tweakcraftutils.tpback")) {
+                            if(savehomesTCUtils.contains(player.getName())) {
+                                savehomesTCUtils.remove(player.getName());
+                                player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
+                            } else {
+                                savehomesTCUtils.add(player.getName());
+                                player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
+                            }
                         } else {
-                            savehomesTCUtils.add(player.getName());
-                            player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
+                            player.sendMessage("You don't have permission to tpback, so this would be useless!");
                         }
                     } else {
-                        player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias> | del <alias> | use <alias> | list | tpback");
+                        player.sendMessage(ChatColor.GREEN + "Usage: /homes add <alias>|del <alias>|use <alias>|list|tpback");
                     }
                 }
             } else {
