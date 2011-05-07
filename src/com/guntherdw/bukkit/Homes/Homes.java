@@ -364,10 +364,10 @@ public class Homes extends JavaPlugin {
                         if(check(player, "tweakcraftutils.tpback")) {
                             if(savehomesTCUtils.contains(player.getName())) {
                                 savehomesTCUtils.remove(player.getName());
-                                player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
+                                player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
                             } else {
                                 savehomesTCUtils.add(player.getName());
-                                player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
+                                player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
                             }
                         } else {
                             player.sendMessage("You don't have permission to tpback, so this would be useless!");
@@ -463,7 +463,7 @@ public class Homes extends JavaPlugin {
                         Location loc = new Location(getServer().getWorld(h.getWorld()),
                                 h.getX(), h.getY()+1, h.getZ(), h.getYaw(), h.getPitch() );
                         if(tweakcraftutils != null) {
-                            if(savehomesTCUtils.contains(player.getName())) {
+                            if(!savehomesTCUtils.contains(player.getName())) {
                                 tweakcraftutils.getTelehistory().addHistory(player.getName(), player.getLocation());
                             }
                         }
