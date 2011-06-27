@@ -2,6 +2,9 @@ package com.guntherdw.bukkit.Homes;
 
 import com.avaje.ebean.validation.Length;
 import com.sun.istack.internal.NotNull;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -118,5 +121,30 @@ public class Home {
 
     public String toString() {
         return "Home{x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
+    }
+
+    public void parseLocation(Location loc) {
+        if(loc==null) return;
+        this.x = loc.getX();
+        this.y = loc.getY();
+        this.z = loc.getZ();
+        this.yaw = loc.getYaw();
+        this.pitch = loc.getPitch();
+        this.world = loc.getWorld().getName();
+    }
+
+    public Location toLocation() {
+        return new Location(Bukkit.getServer().getWorld(this.world), this.x, this.y, this.z, this.yaw, this.pitch);
+    }
+
+    public void parseHome(SaveHome h) {
+        if(h==null) return;
+        this.name = h.getName();
+        this.x = h.getX();
+        this.y = h.getY();
+        this.z = h.getZ();
+        this.yaw = h.getYaw();
+        this.pitch = h.getPitch();
+        this.world = h.getWorld();
     }
 }

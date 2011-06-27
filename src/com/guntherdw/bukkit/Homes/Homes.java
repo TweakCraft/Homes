@@ -2,6 +2,7 @@ package com.guntherdw.bukkit.Homes;
 import com.guntherdw.bukkit.Homes.Commands.iCommand;
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -34,9 +35,14 @@ public class Homes extends JavaPlugin {
         return log;
     }
 
+    public TweakcraftUtils getTweakcraftutils() {
+        return tweakcraftutils;
+    }
+
     public void onEnable() {
         savehomesTCUtils = new ArrayList<String>();
         pdfFile = this.getDescription();
+        this.setupDatabase();
         reloadHomes();
         this.setupPermissions();
         this.setupTCUtils();
@@ -57,9 +63,8 @@ public class Homes extends JavaPlugin {
 
     public void setupDatabase() {
          try {
+             getDatabase().find(Home.class).findRowCount();
              getDatabase().find(SaveHome.class).findRowCount();
-             getDatabase().find(Homes.class).findRowCount();
-
          } catch (PersistenceException ex) {
              log.info("["+pdfFile.getName()+"] Installing database for " +pdfFile.getName()+ " due to first time usage");
              installDDL();
@@ -92,7 +97,7 @@ public class Homes extends JavaPlugin {
 
         List<Home> homeslist = this.getDatabase().find(Home.class).findList();
         for(Home h : homeslist) {
-            homes.put(h.getName(), h);
+            homes.put(h.getName().toLowerCase(), h);
         }
         log.info("["+pdfFile.getName() + "] Loaded " + homes.size() + " homes!");
     }
@@ -102,7 +107,7 @@ public class Homes extends JavaPlugin {
 
         List<Home> homeslist = this.getDatabase().find(Home.class).where().ieq("name", p.getName()).findList();
         for(Home h : homeslist) {
-            homes.put(h.getName(), h);
+            homes.put(h.getName().toLowerCase(), h);
         }
         log.info("["+pdfFile.getName() + "] Loaded " + p.getName() +"'s new home!");
 
@@ -110,11 +115,15 @@ public class Homes extends JavaPlugin {
 
 
     public boolean check(Player player, String permNode) {
+        return this.checkFull(player, "homes."+permNode);
+    }
+
+    public boolean checkFull(Player player, String permNode) {
         if (perm == null) {
             return true;
         } else {
             return player.isOp() ||
-                    perm.getHandler().has(player, "homes."+permNode);
+                    perm.getHandler().has(player, permNode);
         }
     }
 
@@ -131,11 +140,8 @@ public class Homes extends JavaPlugin {
         iCommand IC = chandler.getCommand(command.getName());
         if(IC!=null) {
             /* public abstract boolean executeCommand(CommandSender sender, String cmd, List<String> args, Homes plugin); */
-            if(IC.executeCommand(sender, command.getName(), argsa, this)) {
-                // success
-
-            } else {
-                // failure
+            if(!IC.executeCommand(sender, command.getName(), argsa, this)) {
+                sender.sendMessage(ChatColor.RED+"Something went wrong, contact an admin!");
             }
             return true;
         }

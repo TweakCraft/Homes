@@ -6,6 +6,9 @@
       <root url="jar://$PROJECT_DIR$/../TweakcraftUtils/out/artifacts/TweakcraftUtils/TweakcraftUtils.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../Bukkit/src/main/java" />
+      <root url="file://$PROJECT_DIR$/../Bukkit/src/main/java" />
+    </SOURCES>
   </library>
 </component>
