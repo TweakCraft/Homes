@@ -11,9 +11,8 @@ import javax.persistence.Table;
  * @author GuntherDW
  */
 @Entity
-@Table(name="homes")
-public class Home {
-
+@Table(name="savehomes")
+public class SaveHome {
     @Id
     private int id;
 
@@ -34,8 +33,35 @@ public class Home {
     @Length(max=20)
     private String world;
 
-    @Length(max=35)
+    @Length(max=30)
     private String name;
+
+    @Length(max=30)
+    private String description;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getWorld() {
         return world;
@@ -85,38 +111,7 @@ public class Home {
         this.yaw = yaw;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /* public Home(double x, double y, double z, float yaw, float pitch, String world) {
-
-       X = x;
-       Y = y;
-       Z = z;
-       Yaw = yaw;     // rotx
-       Pitch = pitch; // roty
-       World = world;
-   } */
-    /*
-     00204         double rotX = this.getYaw();
-     00205         double rotY = this.getPitch();
-      */
-
-
     public String toString() {
-        return "Home{x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
+        return "SaveHome{owner:"+this.name+",description:"+this.description+"x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
     }
 }
