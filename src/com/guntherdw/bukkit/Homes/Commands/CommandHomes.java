@@ -69,21 +69,37 @@ public class CommandHomes implements iCommand {
 
         switch(hcmd) {
             case USE:
-                this.useHomes(sender, cmd, args, plugin, skipfirst);
+                if(plugin.check(player, "use"))
+                    this.useHomes(sender, cmd, args, plugin, skipfirst);
+                else
+                    player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case ADD:
-                this.addHomes(sender, cmd, args, plugin, skipfirst);
+                if(plugin.check(player, "add"))
+                    this.addHomes(sender, cmd, args, plugin, skipfirst);
+                else
+                    player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case DELETE:
-                this.delHomes(sender, cmd, args, plugin, skipfirst);
+                if(plugin.check(player, "delete"))
+                    this.delHomes(sender, cmd, args, plugin, skipfirst);
+                else
+                    player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case LIST:
-                this.listHomes(sender, cmd, args, plugin, skipfirst);
+                if(plugin.check(player, "list"))
+                    this.listHomes(sender, cmd, args, plugin, skipfirst);
+                else
+                    player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case GOTO:
-                this.gotoHomes(sender, cmd, args, plugin, skipfirst);
+                if(plugin.check(player, "goto"))
+                    this.gotoHomes(sender, cmd, args, plugin, skipfirst);
+                else
+                    player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case TPBACK:
+                //if(plugin.check(player, "use"))
                 this.tpBackToggle(sender, cmd, args, plugin, skipfirst);
                 break;
         }

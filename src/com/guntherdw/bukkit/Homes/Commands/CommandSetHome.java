@@ -18,7 +18,7 @@ public class CommandSetHome implements iCommand {
         {
             Player player = (Player) sender;
 
-            if(plugin.check(player, "homes.sethome"))
+            if(plugin.check(player, "sethome"))
             {
                 Home home = plugin.getDatabase().find(Home.class).where().ieq("name", player.getName()).findUnique();
                 if(home==null) { home = new Home(); home.setName(player.getName()); }

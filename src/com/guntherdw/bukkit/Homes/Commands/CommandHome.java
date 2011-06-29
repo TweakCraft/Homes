@@ -18,11 +18,11 @@ public class CommandHome implements iCommand {
             if(sender instanceof Player)
             {
                 Player player = (Player) sender;
-                if(plugin.check(player, "homes.home"))
+                if(plugin.check(player, "home"))
                 {
                     boolean bo=false;
                     String playername = "";
-                    if(args.size()!=0 && plugin.check(player, "homes.homesother"))
+                    if(args.size()!=0 && plugin.check(player, "home.other"))
                     {
                         bo=true;
                         playername = args.get(0).toLowerCase();
