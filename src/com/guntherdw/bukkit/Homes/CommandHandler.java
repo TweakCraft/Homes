@@ -1,9 +1,7 @@
 package com.guntherdw.bukkit.Homes;
 
-import com.guntherdw.bukkit.Homes.Commands.CommandHome;
-import com.guntherdw.bukkit.Homes.Commands.CommandHomes;
-import com.guntherdw.bukkit.Homes.Commands.CommandSetHome;
-import com.guntherdw.bukkit.Homes.Commands.iCommand;
+import com.guntherdw.bukkit.Homes.Commands.*;
+import org.bukkit.command.SimpleCommandMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +19,20 @@ public class CommandHandler {
         commandMap.put("home", new CommandHome());
         commandMap.put("homes", new CommandHomes());
         commandMap.put("sethome", new CommandSetHome());
+        commandMap.put("reloadhomes", new CommandReloadHomes());
+    }
+
+    public void addCommand(String cmd, iCommand command) {
+        this.addCommand(cmd, command, false);
+    }
+
+    public void addCommand(String cmd, iCommand command, boolean override) {
+        if(override || !this.commandMap.containsKey(cmd)) {
+            commandMap.put(cmd, command);
+            /* if(this.plugin.getServer().getPluginCommand(cmd)==null) {
+                this.plugin.getServer().
+            } */
+        }
     }
 
     public Homes getPlugin() {

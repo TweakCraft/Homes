@@ -31,7 +31,7 @@ public class CommandHome implements iCommand {
                     }
                     if(plugin.getHomesMap().containsKey(playername.toLowerCase())) {
                         Home h = plugin.getHomesMap().get(playername.toLowerCase());
-                        Location loc = h.toLocation();
+                        Location loc = h.getLocation();
                         if(plugin.getServer().getWorld(h.getWorld())==null) {
                             player.sendMessage(ChatColor.DARK_AQUA + "That world doesn't exist anymore!");
                         }

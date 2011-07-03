@@ -6,9 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author GuntherDW
@@ -22,6 +20,7 @@ public class Home {
 
     @NotNull
     private double x;
+    
     @NotNull
     private double y;
 
@@ -34,18 +33,20 @@ public class Home {
     @NotNull
     private float yaw;
 
+    @NotNull
     @Length(max=20)
     private String world;
 
+    @NotNull
     @Length(max=35)
     private String name;
 
-    public String getWorld() {
-        return world;
+    public int getId() {
+        return id;
     }
 
-    public void setWorld(String world) {
-        this.world = world;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public double getX() {
@@ -88,6 +89,14 @@ public class Home {
         this.yaw = yaw;
     }
 
+    public String getWorld() {
+        return world;
+    }
+
+    public void setWorld(String world) {
+        this.world = world;
+    }
+
     public String getName() {
         return name;
     }
@@ -96,55 +105,32 @@ public class Home {
         this.name = name;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    /* public Home(double x, double y, double z, float yaw, float pitch, String world) {
-
-       X = x;
-       Y = y;
-       Z = z;
-       Yaw = yaw;     // rotx
-       Pitch = pitch; // roty
-       World = world;
-   } */
-    /*
-     00204         double rotX = this.getYaw();
-     00205         double rotY = this.getPitch();
-      */
-
-
     public String toString() {
-        return "Home{x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
+        return "Home{name:"+name+",x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
     }
 
-    public void parseLocation(Location loc) {
-        if(loc==null) return;
-        this.x = loc.getX();
-        this.y = loc.getY();
-        this.z = loc.getZ();
-        this.yaw = loc.getYaw();
-        this.pitch = loc.getPitch();
-        this.world = loc.getWorld().getName();
+    public void setLocation(Location location) {
+        if(location==null) return;
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+        this.world = location.getWorld().getName();
     }
 
-    public Location toLocation() {
+    public Location getLocation() {
         return new Location(Bukkit.getServer().getWorld(this.world), this.x, this.y, this.z, this.yaw, this.pitch);
     }
 
-    public void parseHome(SaveHome h) {
-        if(h==null) return;
-        this.name = h.getName();
-        this.x = h.getX();
-        this.y = h.getY();
-        this.z = h.getZ();
-        this.yaw = h.getYaw();
-        this.pitch = h.getPitch();
-        this.world = h.getWorld();
+    public void setSaveHome(SaveHome saveHome) {
+        if(saveHome==null) return;
+        this.name = saveHome.getName();
+        this.x = saveHome.getX();
+        this.y = saveHome.getY();
+        this.z = saveHome.getZ();
+        this.yaw = saveHome.getYaw();
+        this.pitch = saveHome.getPitch();
+        this.world = saveHome.getWorld();
     }
 }

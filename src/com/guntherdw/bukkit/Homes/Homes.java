@@ -1,4 +1,6 @@
 package com.guntherdw.bukkit.Homes;
+import com.avaje.ebean.LogLevel;
+import com.avaje.ebean.config.ServerConfig;
 import com.guntherdw.bukkit.Homes.Commands.iCommand;
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -42,8 +44,9 @@ public class Homes extends JavaPlugin {
     public void onEnable() {
         savehomesTCUtils = new ArrayList<String>();
         pdfFile = this.getDescription();
+
         this.setupDatabase();
-        reloadHomes();
+        this.reloadHomes();
         this.setupPermissions();
         this.setupTCUtils();
         log.info("["+pdfFile.getName() + "] "+pdfFile.getName()+" version " + pdfFile.getVersion() + " is enabled!");
@@ -52,8 +55,8 @@ public class Homes extends JavaPlugin {
     @Override
     public List<Class<?>> getDatabaseClasses() {
         List<Class<?>> list = new ArrayList<Class<?>>();
-        list.add(Home.class);
         list.add(SaveHome.class);
+        list.add(Home.class);
         return list;
     }
 
@@ -103,7 +106,7 @@ public class Homes extends JavaPlugin {
     }
 
     public void reloadHomes(Player p) {
-        homes = new HashMap<String, Home>();
+        // homes = new HashMap<String, Home>();
 
         List<Home> homeslist = this.getDatabase().find(Home.class).where().ieq("name", p.getName()).findList();
         for(Home h : homeslist) {
