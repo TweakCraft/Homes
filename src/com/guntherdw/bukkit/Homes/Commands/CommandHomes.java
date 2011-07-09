@@ -122,36 +122,21 @@ public class CommandHomes implements iCommand {
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
 
-        SaveHome savehome = plugin.getDatabase().find(SaveHome.class).where().ieq("name", playername).ieq("description", searchstr).findUnique();
 
-        boolean insert = false;
-        if(savehome==null) { insert = true; savehome = new SaveHome(); savehome.setName(playername); savehome.setDescription(searchstr);}
         // savehome.setLocation(((Player)sender).getLocation());
         
         Location loc = ((Player)sender).getLocation();
 
-        savehome.setX(loc.getX());
+        /* savehome.setX(loc.getX());
         savehome.setY(loc.getY()+0.5D);
         savehome.setZ(loc.getZ());
         savehome.setYaw(loc.getYaw());
         savehome.setPitch(loc.getPitch());
-        savehome.setWorld(loc.getWorld().getName());
+        savehome.setWorld(loc.getWorld().getName()); */
+        SaveHome savehome = new SaveHome(((Player)sender).getName(), searchstr, loc);
+        // savehome.
 
-        if(insert) plugin.getDatabase().save(savehome);
-        else {
-        /**
-         * SERIOUSLY EBEAN? CAN'T HANDLE THIS? FFS
-         */
-            /* SqlUpdate query = plugin.getDatabase().createSqlUpdate("UPDATE savehomes SET x="+savehome.getX()+", y="+savehome.getY()+", z="+savehome.getZ()+", yaw="+savehome.getYaw()+", pitch="+savehome.getPitch()
-                                               +" WHERE id="+savehome.getId()+";");
-            plugin.getDatabase().execute(query); */
-            plugin.getDatabase().execute(plugin.getDatabase().createCallableSql("UPDATE savehomes SET x="+savehome.getX()+", y="+savehome.getY()+", z="+savehome.getZ()+", yaw="+savehome.getYaw()+", pitch="+savehome.getPitch()
-                                               +" WHERE id="+savehome.getId()+""));
-        }
-        /**
-         * NOW, WAS THAT SO HARD?
-         */
-
+        plugin.getDataSource().addSavehome(((Player) sender).getName(), savehome);
         sender.sendMessage(ChatColor.GREEN + "Home '" + savehome.getDescription() + "' saved.");
         // sender.sendMessage("It should be at "+savehome.getLocation().toString());
         return true;
@@ -163,12 +148,13 @@ public class CommandHomes implements iCommand {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
+        /* String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
         Home home = plugin.getDatabase().find(Home.class).where().ieq("name", ((Player)sender).getName()).findUnique();
         if(home==null) { home = new Home(); home.setName(((Player)sender).getName()); }
         List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
-        SaveHome searchhome=null;
-        if(searchhomelist.size()>1) {
+        SaveHome searchhome=null; */
+        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
+        /* if(searchhomelist.size()>1) {
             String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: ";
             for(SaveHome svh : searchhomelist)
                 msg+=svh.getDescription()+", ";
@@ -183,16 +169,24 @@ public class CommandHomes implements iCommand {
         } else {
             sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
             return true;
-        }
+        } */
 
-        home.setSaveHome(searchhome);
+        // home.setSaveHome(searchhome);
         // plugin.getServer().broadcastMessage("Got home, was at x:"+searchhome.getX());
-        plugin.getDatabase().save(home);
-        plugin.getHomesMap().put(((Player)sender).getName().toLowerCase(), home);
+        // plugin.getDatabase().save(home);
+        if(searchhome!=null){
+            Home home = new Home();
+            home.setSaveHome(searchhome);
+            plugin.getHomesMap().put(((Player)sender).getName().toLowerCase(), home);
 
-        sender.sendMessage(ChatColor.GREEN + "Home '" + searchhome.getDescription() + "' loaded. It's your /home now!");
+            sender.sendMessage(ChatColor.GREEN + "Home '" + searchhome.getDescription() + "' loaded. It's your /home now!");
+            plugin.getDataSource().saveHome(home);
 
-        return true;
+            return true;
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            return false;
+        }
     }
 
     public boolean gotoHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
@@ -201,7 +195,7 @@ public class CommandHomes implements iCommand {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
+        /* String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
         List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
         SaveHome searchhome=null;
         if(searchhomelist.size()>1) {
@@ -219,18 +213,25 @@ public class CommandHomes implements iCommand {
         } else {
             sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
             return true;
-        }
+        } */
 
-        sender.sendMessage(ChatColor.GREEN+"Teleporting you to Home '"+searchhome.getDescription()+"'!");
-        if(plugin.getTweakcraftutils()!= null) {
-            if(!plugin.savehomesTCUtils.contains(((Player)sender).getName())) {
-                plugin.getTweakcraftutils().getTelehistory().addHistory(((Player)sender).getName(), ((Player)sender).getLocation());
+        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
+        if(searchhome!=null) {
+
+            sender.sendMessage(ChatColor.GREEN+"Teleporting you to Home '"+searchhome.getDescription()+"'!");
+            if(plugin.getTweakcraftutils()!= null) {
+                if(!plugin.savehomesTCUtils.contains(((Player)sender).getName())) {
+                    plugin.getTweakcraftutils().getTelehistory().addHistory(((Player)sender).getName(), ((Player)sender).getLocation());
+                }
             }
-        }
-        Location loc = searchhome.getLocation();
-        ((Player)sender).teleport(loc);
+            Location loc = searchhome.getLocation();
+            ((Player)sender).teleport(loc);
 
-        return true;
+            return true;
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            return false;
+        }
     }
 
     public boolean delHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
@@ -239,11 +240,11 @@ public class CommandHomes implements iCommand {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
+        // String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
         // Home home = plugin.getDatabase().find(Home.class).where().ieq("name", ((Player)sender).getName()).findUnique();
         // if(home==null) { home = new Home(); home.setName(((Player)sender).getName()); }
-        List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
-        if(searchhomelist.size()>1) {
+        // List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
+        /* if(searchhomelist.size()>1) {
             String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: ";
             for(SaveHome svh : searchhomelist)
                 msg+=svh.getDescription()+", ";
@@ -257,14 +258,25 @@ public class CommandHomes implements iCommand {
         } else {
             sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
             return true;
+        } */
+        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
+        if(searchhome!=null) {
+            if(plugin.getDataSource().deleteHome(((Player)sender).getName(), searchhome.getId())) {
+                sender.sendMessage(ChatColor.GREEN+"Deleted SaveHome with description '"+searchhome.getDescription()+"'!");
+            } else {
+                sender.sendMessage(ChatColor.GREEN+"Failure during deletion!");
+            }
+            return true;
+        } else {
+            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            return false;
         }
-        return true;
     }
 
     public boolean listHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
         String msg = ChatColor.GREEN.toString();
-        List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).findList();
-        if (searchhomelist.size()>0) {
+        List<SaveHome> searchhomelist = plugin.getDataSource().getSaveHomes(((Player)sender).getName()); // plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).findList();
+        if (searchhomelist!=null && searchhomelist.size()>0) {
             msg += "Your homes: " + ChatColor.WHITE;
 
             for(SaveHome svh : searchhomelist)

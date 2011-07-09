@@ -1,12 +1,11 @@
 name: Homes
 main: com.guntherdw.bukkit.Homes.Homes
 website: https://github.com/GuntherDW/Homes
-version: 2.0
+version: 2.5
 authors:
     - Grumm
     - Meaglin
     - GuntherDW
-database: true
 commands:
     homes:
         description: Multi-homes plugin

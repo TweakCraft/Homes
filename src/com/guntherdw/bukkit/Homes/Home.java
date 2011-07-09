@@ -105,6 +105,22 @@ public class Home {
         this.name = name;
     }
 
+    public Home() {
+        
+    }
+
+    public Home(String playername, Location location) {
+        if(location==null) return;
+        if(playername==null) return;
+        this.name = playername;
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+        this.world = location.getWorld().getName();
+    }
+
     public String toString() {
         return "Home{name:"+name+",x:"+this.x+",y:"+this.y+",z:"+this.z+",Yaw:"+this.yaw+",Pitch:"+this.pitch+",World:"+this.world+"}";
     }
@@ -132,5 +148,26 @@ public class Home {
         this.yaw = saveHome.getYaw();
         this.pitch = saveHome.getPitch();
         this.world = saveHome.getWorld();
+    }
+
+    public Home(String name, double x, double y, double z, float yaw, float pitch, String world) {
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;     // rotx
+        this.pitch = pitch; // roty
+        this.world = world;
+    }
+
+    public Home(int id, String name, double x, double y, double z, float yaw, float pitch, String world) {
+        this.id = id;
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;     // rotx
+        this.pitch = pitch; // roty
+        this.world = world;
     }
 }

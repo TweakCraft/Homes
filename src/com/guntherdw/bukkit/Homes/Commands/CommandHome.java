@@ -25,7 +25,7 @@ public class CommandHome implements iCommand {
                     if(args.size()!=0 && plugin.check(player, "home.other"))
                     {
                         bo=true;
-                        playername = args.get(0).toLowerCase();
+                        playername = args.get(0);
                     } else {
                         playername = player.getName();
                     }

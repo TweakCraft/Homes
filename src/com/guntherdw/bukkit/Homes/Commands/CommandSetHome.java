@@ -21,33 +21,13 @@ public class CommandSetHome implements iCommand {
 
             if(plugin.check(player, "sethome"))
             {
-                Home home = plugin.getDatabase().find(Home.class).where().ieq("name", player.getName()).findUnique();
-                boolean insert = false;
-                if(home==null) { insert = true; home = new Home(); home.setName(player.getName()); }
-                Location loc = player.getLocation();
-                home.setX(loc.getX());
-                home.setY(loc.getY()+0.5D);
-                home.setZ(loc.getZ());
-                home.setWorld(loc.getWorld().getName());
-                home.setPitch(loc.getPitch());
-                home.setYaw(loc.getYaw());
+                Home home = new Home(player.getName(), player.getLocation());
 
-                if(insert) plugin.getDatabase().save(home);
-                else {
-                    /**
-                     * SERIOUSLY EBEAN? CAN'T HANDLE THIS? FFS
-                     */
-                    /* SqlUpdate query = plugin.getDatabase().createSqlUpdate("UPDATE homes SET x="+home.getX()+", y="+home.getY()+", z="+home.getZ()+", yaw="+home.getYaw()+", pitch="+home.getPitch()
-                            +" WHERE id="+home.getId()+";");
-                    plugin.getDatabase().execute(query); */
-
-                    plugin.getDatabase().execute(plugin.getDatabase().createCallableSql("UPDATE homes SET x="+home.getX()+", y="+home.getY()+", z="+home.getZ()+", yaw="+home.getYaw()+", pitch="+home.getPitch()
-                            +" WHERE id="+home.getId()+""));
-                }
+                plugin.getDataSource().saveHome(home);
 
                 // player.sendMessage("INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
                 player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
-                plugin.getHomesMap().put(player.getName(), home);
+                plugin.getHomesMap().put(player.getName().toLowerCase(), home);
                 plugin.getLogger().info("[Homes] "+player.getName()+" set his home!");
             } else {
                 player.sendMessage("You don't have permission to use /sethome!");

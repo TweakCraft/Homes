@@ -2,6 +2,8 @@ package com.guntherdw.bukkit.Homes;
 import com.avaje.ebean.LogLevel;
 import com.avaje.ebean.config.ServerConfig;
 import com.guntherdw.bukkit.Homes.Commands.iCommand;
+import com.guntherdw.bukkit.Homes.DataSource.DataSource;
+import com.guntherdw.bukkit.Homes.DataSource.Sources.MySQL;
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.ChatColor;
@@ -24,13 +26,44 @@ public class Homes extends JavaPlugin {
     public static Permissions perm = null;
     private CommandHandler chandler = new CommandHandler(this);
     public Map<String, Home> homes;
+    public List<SaveHome> savehomes;
     public List<String> savehomesTCUtils;
     public TweakcraftUtils tweakcraftutils;
     public PluginDescriptionFile pdfFile = null;
+    public DataSource ds;
 
+    public SaveHome matchHome(String playername, String homename) {
+		SaveHome rt = getSavehome(playername, homename);
+		if(rt == null) {
+			int delta = Integer.MAX_VALUE;
+			for(SaveHome sh : savehomes) {
+				if(sh.getName().equalsIgnoreCase(playername) && sh.getDescription().toLowerCase().contains(homename) && Math.abs(sh.getDescription().length() - homename.length()) < delta) {
+					rt = sh;
+					delta = Math.abs(sh.getDescription().length() - homename.length());
+					if(delta == 0) break;
+				}
+			}
+		}
+
+		return rt;
+	}
+
+    public SaveHome getSavehome(String player, String description) {
+        for(SaveHome sh : ds.getSaveHomes(player)) {
+            if(sh.getDescription().toLowerCase().equals(description.toLowerCase())) {
+                return sh;
+            }
+        }
+        return null;
+    }
+    
     public void onDisable() {
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("["+pdfFile.getName() + "] Homes version " + pdfFile.getVersion() + " is disabled!");
+    }
+
+    public DataSource getDataSource() {
+        return ds;
     }
 
     public Logger getLogger() {
@@ -45,26 +78,28 @@ public class Homes extends JavaPlugin {
         savehomesTCUtils = new ArrayList<String>();
         pdfFile = this.getDescription();
 
-        this.setupDatabase();
+        // this.setupDatabase();
+        this.ds = new MySQL(this);
         this.reloadHomes();
+        this.reloadSavehomes();
         this.setupPermissions();
         this.setupTCUtils();
         log.info("["+pdfFile.getName() + "] "+pdfFile.getName()+" version " + pdfFile.getVersion() + " is enabled!");
     }
 
-    @Override
+    /* @Override
     public List<Class<?>> getDatabaseClasses() {
         List<Class<?>> list = new ArrayList<Class<?>>();
         list.add(SaveHome.class);
         list.add(Home.class);
         return list;
-    }
+    } */
 
     public Map<String, Home> getHomesMap() {
         return homes;
     }
 
-    public void setupDatabase() {
+    /* public void setupDatabase() {
          try {
              getDatabase().find(Home.class).findRowCount();
              getDatabase().find(SaveHome.class).findRowCount();
@@ -72,7 +107,7 @@ public class Homes extends JavaPlugin {
              log.info("["+pdfFile.getName()+"] Installing database for " +pdfFile.getName()+ " due to first time usage");
              installDDL();
          }
-    }
+    } */
 
     public void setupPermissions() {
         Plugin plugin = this.getServer().getPluginManager().getPlugin("Permissions");
@@ -98,22 +133,28 @@ public class Homes extends JavaPlugin {
     public void reloadHomes() {
         homes = new HashMap<String, Home>();
 
-        List<Home> homeslist = this.getDatabase().find(Home.class).findList();
-        for(Home h : homeslist) {
+        homes = this.ds.getHomesMap(); // this.getDatabase().find(Home.class).findList();
+        /* for(Home h : homeslist) {
             homes.put(h.getName().toLowerCase(), h);
-        }
+        } */
         log.info("["+pdfFile.getName() + "] Loaded " + homes.size() + " homes!");
     }
 
     public void reloadHomes(Player p) {
         // homes = new HashMap<String, Home>();
 
-        List<Home> homeslist = this.getDatabase().find(Home.class).where().ieq("name", p.getName()).findList();
-        for(Home h : homeslist) {
+        /* List<Home> homeslist = this.getDatabase().find(Home.class).where().ieq("name", p.getName()).findList(); */
+        Home h = this.ds.getHome(p.getName()); // )) {
+        if(h!=null) {
             homes.put(h.getName().toLowerCase(), h);
         }
         log.info("["+pdfFile.getName() + "] Loaded " + p.getName() +"'s new home!");
 
+    }
+
+    public void reloadSavehomes() {
+        savehomes = this.ds.getSaveHomes();
+        log.info("["+pdfFile.getName() + "] Loaded " + (savehomes!=null?savehomes.size():"0") + " savehomes!");
     }
 
 
