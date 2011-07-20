@@ -137,6 +137,7 @@ public class CommandHomes implements iCommand {
         // savehome.
 
         plugin.getDataSource().addSavehome(((Player) sender).getName(), savehome);
+        plugin.reloadSavehomes();
         sender.sendMessage(ChatColor.GREEN + "Home '" + savehome.getDescription() + "' saved.");
         // sender.sendMessage("It should be at "+savehome.getLocation().toString());
         return true;
@@ -263,6 +264,7 @@ public class CommandHomes implements iCommand {
         if(searchhome!=null) {
             if(plugin.getDataSource().deleteHome(((Player)sender).getName(), searchhome.getId())) {
                 sender.sendMessage(ChatColor.GREEN+"Deleted SaveHome with description '"+searchhome.getDescription()+"'!");
+                plugin.reloadSavehomes();
             } else {
                 sender.sendMessage(ChatColor.GREEN+"Failure during deletion!");
             }
