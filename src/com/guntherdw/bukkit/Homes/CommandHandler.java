@@ -1,7 +1,6 @@
 package com.guntherdw.bukkit.Homes;
 
 import com.guntherdw.bukkit.Homes.Commands.*;
-import org.bukkit.command.SimpleCommandMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +16,7 @@ public class CommandHandler {
         this.plugin = instance;
         commandMap.clear();
         commandMap.put("home", new CommandHome());
+        commandMap.put("hg", new CommandHomesGoto());
         commandMap.put("homes", new CommandHomes());
         commandMap.put("sethome", new CommandSetHome());
         commandMap.put("reloadhomes", new CommandReloadHomes());

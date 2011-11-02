@@ -1,10 +1,8 @@
 package com.guntherdw.bukkit.Homes.Commands;
 
-import com.avaje.ebean.SqlUpdate;
 import com.guntherdw.bukkit.Homes.Home;
 import com.guntherdw.bukkit.Homes.Homes;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -28,7 +26,7 @@ public class CommandSetHome implements iCommand {
                 // player.sendMessage("INTO homes (x,y,z,rotX,rotY,world,name) VALUES (?,?,?,?,?,?,?)");
                 player.sendMessage(ChatColor.GREEN + "Successfully set your home!");
                 plugin.getHomesMap().put(player.getName().toLowerCase(), home);
-                plugin.getLogger().info("[Homes] "+player.getName()+" set his home!");
+                plugin.getLogger().info("[Homes] "+player.getName()+" set his home at location world:"+home.getWorld()+" x:"+home.getX()+" y:"+home.getY()+" z:"+home.getZ());
             } else {
                 player.sendMessage("You don't have permission to use /sethome!");
             }

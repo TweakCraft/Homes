@@ -21,3 +21,7 @@ commands:
         description: Reloads the homes map
         usage: /<command>
         _permission: homes.homesother
+    hg:
+        description: Alias for /homes goto
+        usage: /<command> <homename>
+        _permission: homes.homes

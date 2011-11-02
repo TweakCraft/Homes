@@ -5,10 +5,12 @@ import com.guntherdw.bukkit.Homes.Home;
 import com.guntherdw.bukkit.Homes.Homes;
 import com.guntherdw.bukkit.Homes.SaveHome;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author GuntherDW
@@ -52,7 +54,7 @@ public class MySQL extends DataSource {
             String url = "jdbc:mysql://"+dbhost+":3306/" + db;
             return DriverManager.getConnection(url + "?autoReconnect=true&user=" + user + "&password=" + pass);
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
             return null;
         }
     }
@@ -95,7 +97,7 @@ public class MySQL extends DataSource {
             // plugin.getLogger().info("[Homes] Loaded " + count + " homes!");
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return h;
     }
@@ -119,7 +121,7 @@ public class MySQL extends DataSource {
             // plugin.getLogger().info("[Homes] Loaded " + count + " homes!");
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return homes;
     }
@@ -190,6 +192,8 @@ public class MySQL extends DataSource {
                     st.close();
                 if (rs != null)
                     rs.close();
+                if(conn!=null)
+                    conn.close();
             } catch (Exception e) {
             }
         }
@@ -226,6 +230,8 @@ public class MySQL extends DataSource {
                     st.close();
                 if (rs != null)
                     rs.close();
+                if(conn!=null)
+                    conn.close();
             } catch (Exception e) {
             }
         }
@@ -246,11 +252,13 @@ public class MySQL extends DataSource {
             rancorrect = st.executeUpdate() > 0;
             st.close();
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } finally {
             try {
                 if (st != null)
                     st.close();
+                if(conn!=null)
+                    conn.close();
             } catch (Exception e) {
             }
         }
@@ -294,6 +302,8 @@ public class MySQL extends DataSource {
                     conn.close();
                 if (st != null)
                     st.close();
+                if(conn!=null)
+                    conn.close();
             } catch (Exception e) {
             }
         }
@@ -333,6 +343,8 @@ public class MySQL extends DataSource {
                     st.close();
                 if (rs != null)
                     rs.close();
+                if(conn!=null)
+                    conn.close();
             } catch (Exception e) {
             }
         }

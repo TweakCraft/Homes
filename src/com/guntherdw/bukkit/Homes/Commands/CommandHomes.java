@@ -1,7 +1,5 @@
 package com.guntherdw.bukkit.Homes.Commands;
 
-import com.avaje.ebean.SqlQuery;
-import com.avaje.ebean.SqlUpdate;
 import com.guntherdw.bukkit.Homes.Home;
 import com.guntherdw.bukkit.Homes.Homes;
 import com.guntherdw.bukkit.Homes.SaveHome;
@@ -73,37 +71,37 @@ public class CommandHomes implements iCommand {
         switch(hcmd) {
             case USE:
                 if(plugin.check(player, "use"))
-                    this.useHomes(sender, cmd, args, plugin, skipfirst);
+                    this.useHomes(player, cmd, args, plugin, skipfirst);
                 else
                     player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case ADD:
                 if(plugin.check(player, "add"))
-                    this.addHomes(sender, cmd, args, plugin, skipfirst);
+                    this.addHomes(player, cmd, args, plugin, skipfirst);
                 else
                     player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case DELETE:
                 if(plugin.check(player, "delete"))
-                    this.delHomes(sender, cmd, args, plugin, skipfirst);
+                    this.delHomes(player, cmd, args, plugin, skipfirst);
                 else
                     player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case LIST:
                 if(plugin.check(player, "list"))
-                    this.listHomes(sender, cmd, args, plugin, skipfirst);
+                    this.listHomes(player, cmd, args, plugin, skipfirst);
                 else
                     player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case GOTO:
                 if(plugin.check(player, "goto"))
-                    this.gotoHomes(sender, cmd, args, plugin, skipfirst);
+                    this.gotoHomes(player, cmd, args, plugin, skipfirst);
                 else
                     player.sendMessage(ChatColor.RED+"You don't have permission for that!");
                 break;
             case TPBACK:
                 //if(plugin.check(player, "use"))
-                this.tpBackToggle(sender, cmd, args, plugin, skipfirst);
+                this.tpBackToggle(player, cmd, args, plugin, skipfirst);
                 break;
         }
 
@@ -114,170 +112,99 @@ public class CommandHomes implements iCommand {
         return "homes";
     }
 
-    public boolean addHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
-        String playername = ((Player)sender).getName();
+    public boolean addHomes(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+        String playername = player.getName();
         String searchstr = "";
         for(int x = skipfirst?0:1; x<args.size(); x++) {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-
-
-        // savehome.setLocation(((Player)sender).getLocation());
         
-        Location loc = ((Player)sender).getLocation();
+        Location loc = player.getLocation();
+        SaveHome savehome = new SaveHome(player.getName(), searchstr, loc);
 
-        /* savehome.setX(loc.getX());
-        savehome.setY(loc.getY()+0.5D);
-        savehome.setZ(loc.getZ());
-        savehome.setYaw(loc.getYaw());
-        savehome.setPitch(loc.getPitch());
-        savehome.setWorld(loc.getWorld().getName()); */
-        SaveHome savehome = new SaveHome(((Player)sender).getName(), searchstr, loc);
-        // savehome.
-
-        plugin.getDataSource().addSavehome(((Player) sender).getName(), savehome);
+        plugin.getDataSource().addSavehome(player.getName(), savehome);
         plugin.reloadSavehomes();
-        sender.sendMessage(ChatColor.GREEN + "Home '" + savehome.getDescription() + "' saved.");
+        plugin.getLogger().info("[Homes] "+player.getName()+" added home with name "+savehome.getDescription()+" at location world:"+loc.getWorld()+" x:"+loc.getX()+" y:"+loc.getY()+" z:"+loc.getZ());;
+        player.sendMessage(ChatColor.GREEN + "Home '" + savehome.getDescription() + "' saved.");
         // sender.sendMessage("It should be at "+savehome.getLocation().toString());
         return true;
     }
 
-    public boolean useHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+    public boolean useHomes(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
         String searchstr = "";
         for(int x = skipfirst?0:1; x<args.size(); x++) {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        /* String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
-        Home home = plugin.getDatabase().find(Home.class).where().ieq("name", ((Player)sender).getName()).findUnique();
-        if(home==null) { home = new Home(); home.setName(((Player)sender).getName()); }
-        List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
-        SaveHome searchhome=null; */
-        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
-        /* if(searchhomelist.size()>1) {
-            String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: ";
-            for(SaveHome svh : searchhomelist)
-                msg+=svh.getDescription()+", ";
-            msg=msg.substring(0, msg.length()-2);
-
-            sender.sendMessage(msg);
-            sender.sendMessage(ChatColor.GREEN+"Selected home: '"+searchhomelist.get(0).getDescription()+"'!");
-            searchhome = searchhomelist.get(0);
-            // return true;
-        } else if(searchhomelist.size()==1) {
-            searchhome = searchhomelist.get(0);
-        } else {
-            sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
-            return true;
-        } */
-
-        // home.setSaveHome(searchhome);
-        // plugin.getServer().broadcastMessage("Got home, was at x:"+searchhome.getX());
-        // plugin.getDatabase().save(home);
+        SaveHome searchhome = plugin.matchHome(player.getName(), searchstr);
         if(searchhome!=null){
             Home home = new Home();
             home.setSaveHome(searchhome);
-            plugin.getHomesMap().put(((Player)sender).getName().toLowerCase(), home);
+            plugin.getHomesMap().put(player.getName().toLowerCase(), home);
 
-            sender.sendMessage(ChatColor.GREEN + "Home '" + searchhome.getDescription() + "' loaded. It's your /home now!");
+            player.sendMessage(ChatColor.GREEN + "Home '" + searchhome.getDescription() + "' loaded. It's your /home now!");
+            plugin.getLogger().info("[Homes] "+player.getName()+" loaded home with name "+searchhome.getDescription());
             plugin.getDataSource().saveHome(home);
 
             return true;
         } else {
-            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            player.sendMessage(ChatColor.GREEN + "No homes by that name found!");
             return false;
         }
     }
 
-    public boolean gotoHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+    public boolean gotoHomes(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
         String searchstr = "";
         for(int x = skipfirst?0:1; x<args.size(); x++) {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        /* String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
-        List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
-        SaveHome searchhome=null;
-        if(searchhomelist.size()>1) {
-            String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: ";
-            for(SaveHome svh : searchhomelist)
-                msg+=svh.getDescription()+", ";
-            msg=msg.substring(0, msg.length()-2);
-
-            sender.sendMessage(msg);
-            sender.sendMessage(ChatColor.GREEN+"Selected home: '"+searchhomelist.get(0).getDescription()+"'!");
-            searchhome = searchhomelist.get(0);
-            // return true;
-        } else if(searchhomelist.size()==1) {
-            searchhome = searchhomelist.get(0);
-        } else {
-            sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
-            return true;
-        } */
-
-        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
+        SaveHome searchhome = plugin.matchHome(player.getName(), searchstr);
         if(searchhome!=null) {
 
-            sender.sendMessage(ChatColor.GREEN+"Teleporting you to Home '"+searchhome.getDescription()+"'!");
+            player.sendMessage(ChatColor.GREEN+"Teleporting you to Home '"+searchhome.getDescription()+"'!");
+            plugin.getLogger().info("[Homes] "+player.getName()+" teleported to home with name "+searchhome.getDescription());
             if(plugin.getTweakcraftutils()!= null) {
-                if(!plugin.savehomesTCUtils.contains(((Player)sender).getName())) {
-                    plugin.getTweakcraftutils().getTelehistory().addHistory(((Player)sender).getName(), ((Player)sender).getLocation());
+                if(!plugin.savehomesTCUtils.contains(player.getName())) {
+                    plugin.getTweakcraftutils().getTelehistory().addHistory(player.getName(), player.getLocation());
                 }
             }
             Location loc = searchhome.getLocation();
-            ((Player)sender).teleport(loc);
+            player.teleport(loc);
 
             return true;
         } else {
-            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            player.sendMessage(ChatColor.GREEN + "No homes by that name found!");
             return false;
         }
     }
 
-    public boolean delHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+    public boolean delHomes(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
         String searchstr = "";
         for(int x = skipfirst?0:1; x<args.size(); x++) {
             searchstr+= args.get(x)+" ";
         }
         if(searchstr.length()>0) searchstr = searchstr.trim();
-        // String nameEscaped = searchstr.replaceAll("%", "\\%").replaceAll("_", "\\_");
-        // Home home = plugin.getDatabase().find(Home.class).where().ieq("name", ((Player)sender).getName()).findUnique();
-        // if(home==null) { home = new Home(); home.setName(((Player)sender).getName()); }
-        // List<SaveHome> searchhomelist = plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).like("description", nameEscaped + "%").findList();
-        /* if(searchhomelist.size()>1) {
-            String msg = ChatColor.LIGHT_PURPLE + "Found multiple results: ";
-            for(SaveHome svh : searchhomelist)
-                msg+=svh.getDescription()+", ";
-            msg=msg.substring(0, msg.length()-2);
-            sender.sendMessage(msg);
-            return true;
-        } else if(searchhomelist.size()==1) {
-            SaveHome sh = searchhomelist.get(0);
-            plugin.getDatabase().delete(SaveHome.class, sh.getId());
-            sender.sendMessage(ChatColor.LIGHT_PURPLE + "Home '"+sh.getDescription()+"' deleted!");
-        } else {
-            sender.sendMessage(ChatColor.LIGHT_PURPLE + "No home found for: " + searchstr);
-            return true;
-        } */
-        SaveHome searchhome = plugin.matchHome(((Player)sender).getName(), searchstr);
+        SaveHome searchhome = plugin.matchHome(player.getName(), searchstr);
         if(searchhome!=null) {
-            if(plugin.getDataSource().deleteHome(((Player)sender).getName(), searchhome.getId())) {
-                sender.sendMessage(ChatColor.GREEN+"Deleted SaveHome with description '"+searchhome.getDescription()+"'!");
+            if(plugin.getDataSource().deleteHome(player.getName(), searchhome.getId())) {
+                player.sendMessage(ChatColor.GREEN+"Deleted SaveHome with description '"+searchhome.getDescription()+"'!");
+                plugin.getLogger().info("[Homes] "+player.getName()+" deleted home with name "+searchhome.getDescription());
                 plugin.reloadSavehomes();
             } else {
-                sender.sendMessage(ChatColor.GREEN+"Failure during deletion!");
+                player.sendMessage(ChatColor.GREEN+"Failure during deletion!");
             }
             return true;
         } else {
-            sender.sendMessage(ChatColor.GREEN + "No homes by that name found!");
+            player.sendMessage(ChatColor.GREEN + "No homes by that name found!");
             return false;
         }
     }
 
-    public boolean listHomes(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+    public boolean listHomes(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
         String msg = ChatColor.GREEN.toString();
-        List<SaveHome> searchhomelist = plugin.getDataSource().getSaveHomes(((Player)sender).getName()); // plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).findList();
+        List<SaveHome> searchhomelist = plugin.getDataSource().getSaveHomes(player.getName()); // plugin.getDatabase().find(SaveHome.class).where().ieq("name", ((Player) sender).getName()).findList();
         if (searchhomelist!=null && searchhomelist.size()>0) {
             msg += "Your homes: " + ChatColor.WHITE;
 
@@ -288,21 +215,22 @@ public class CommandHomes implements iCommand {
         } else {
             msg += "No homes found";
         }
-        sender.sendMessage(msg);
+        plugin.getLogger().info("[Homes] "+player.getName()+" listed his homes");
+        player.sendMessage(msg);
         return true;
     }
     
-    public boolean tpBackToggle(CommandSender sender, String cmd, List<String> args, Homes plugin, boolean skipfirst){
-        if(plugin.checkFull((Player) sender, "tweakcraftutils.tpback")) {
-            if(plugin.savehomesTCUtils.contains(((Player)sender).getName())) {
-                plugin.savehomesTCUtils.remove(((Player)sender).getName());
-                sender.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
+    public boolean tpBackToggle(Player player, String cmd, List<String> args, Homes plugin, boolean skipfirst){
+        if(plugin.checkFull(player, "tweakcraftutils.tpback")) {
+            if(plugin.savehomesTCUtils.contains(player.getName())) {
+                plugin.savehomesTCUtils.remove(player.getName());
+                player.sendMessage(ChatColor.GOLD+"Going home will set a tpback entry!");
             } else {
-                plugin.savehomesTCUtils.add(((Player)sender).getName());
-                sender.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
+                plugin.savehomesTCUtils.add(player.getName());
+                player.sendMessage(ChatColor.GOLD+"Going home will no longer set a tpback entry!");
             }
         } else {
-            sender.sendMessage("You don't have permission to tpback, so this would be useless!");
+            player.sendMessage("You don't have permission to tpback, so this would be useless!");
         }
         return true;
     }

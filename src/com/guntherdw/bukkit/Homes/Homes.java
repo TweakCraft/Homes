@@ -1,6 +1,4 @@
 package com.guntherdw.bukkit.Homes;
-import com.avaje.ebean.LogLevel;
-import com.avaje.ebean.config.ServerConfig;
 import com.guntherdw.bukkit.Homes.Commands.iCommand;
 import com.guntherdw.bukkit.Homes.DataSource.DataSource;
 import com.guntherdw.bukkit.Homes.DataSource.Sources.MySQL;
@@ -14,7 +12,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +28,7 @@ public class Homes extends JavaPlugin {
     public TweakcraftUtils tweakcraftutils;
     public PluginDescriptionFile pdfFile = null;
     public DataSource ds;
+    public boolean usePermissions = false;
 
     public SaveHome matchHome(String playername, String homename) {
 		SaveHome rt = getSavehome(playername, homename);
@@ -82,39 +80,24 @@ public class Homes extends JavaPlugin {
         this.ds = new MySQL(this);
         this.reloadHomes();
         this.reloadSavehomes();
-        this.setupPermissions();
+        usePermissions = this.getConfiguration().getBoolean("usePermissions", false);
+        if(usePermissions) this.setupPermissions();
         this.setupTCUtils();
         log.info("["+pdfFile.getName() + "] "+pdfFile.getName()+" version " + pdfFile.getVersion() + " is enabled!");
     }
-
-    /* @Override
-    public List<Class<?>> getDatabaseClasses() {
-        List<Class<?>> list = new ArrayList<Class<?>>();
-        list.add(SaveHome.class);
-        list.add(Home.class);
-        return list;
-    } */
 
     public Map<String, Home> getHomesMap() {
         return homes;
     }
 
-    /* public void setupDatabase() {
-         try {
-             getDatabase().find(Home.class).findRowCount();
-             getDatabase().find(SaveHome.class).findRowCount();
-         } catch (PersistenceException ex) {
-             log.info("["+pdfFile.getName()+"] Installing database for " +pdfFile.getName()+ " due to first time usage");
-             installDDL();
-         }
-    } */
-
     public void setupPermissions() {
-        Plugin plugin = this.getServer().getPluginManager().getPlugin("Permissions");
+        if(this.usePermissions) {
+            Plugin plugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
-        if (perm == null) {
-            if (plugin != null) {
-                perm = (Permissions) plugin;
+            if (perm == null) {
+                if (plugin != null) {
+                    perm = (Permissions) plugin;
+                }
             }
         }
     }
@@ -133,18 +116,12 @@ public class Homes extends JavaPlugin {
     public void reloadHomes() {
         homes = new HashMap<String, Home>();
 
-        homes = this.ds.getHomesMap(); // this.getDatabase().find(Home.class).findList();
-        /* for(Home h : homeslist) {
-            homes.put(h.getName().toLowerCase(), h);
-        } */
+        homes = this.ds.getHomesMap();
         log.info("["+pdfFile.getName() + "] Loaded " + homes.size() + " homes!");
     }
 
     public void reloadHomes(Player p) {
-        // homes = new HashMap<String, Home>();
-
-        /* List<Home> homeslist = this.getDatabase().find(Home.class).where().ieq("name", p.getName()).findList(); */
-        Home h = this.ds.getHome(p.getName()); // )) {
+        Home h = this.ds.getHome(p.getName());
         if(h!=null) {
             homes.put(h.getName().toLowerCase(), h);
         }
@@ -163,11 +140,12 @@ public class Homes extends JavaPlugin {
     }
 
     public boolean checkFull(Player player, String permNode) {
-        if (perm == null) {
+        
+        if (usePermissions && perm == null) {
             return true;
         } else {
             return player.isOp() ||
-                    perm.getHandler().has(player, permNode);
+                    ((usePermissions && perm.getHandler().has(player, permNode)) || player.hasPermission(permNode));
         }
     }
 
