@@ -33,10 +33,10 @@ public class Homes extends JavaPlugin {
     }
 
     public void setupConnection() {
-        this.dbhost = getConfiguration().getString("dbhost");
-        this.db =  getConfiguration().getString("database");
-        this.user = getConfiguration().getString("username");
-        this.pass = getConfiguration().getString("password");
+        this.dbhost = getConfig().getString("dbhost");
+        this.db =  getConfig().getString("database");
+        this.user = getConfig().getString("username");
+        this.pass = getConfig().getString("password");
     }
 
     private void loadDriver() {
@@ -63,9 +63,9 @@ public class Homes extends JavaPlugin {
     public void initConfig()
     {
         try{
-            getConfiguration().setProperty("database", "databasename");
-            getConfiguration().setProperty("username", "database-username");
-            getConfiguration().setProperty("password", "database-password");
+            getConfig().set("database", "databasename");
+            getConfig().set("username", "database-username");
+            getConfig().set("password", "database-password");
         } catch (Throwable e)
         {
             log.severe("[Homes] There was an exception while we were saving the config, be sure to doublecheck!");
@@ -73,7 +73,7 @@ public class Homes extends JavaPlugin {
     }
 
     public void onEnable() {
-        if(getConfiguration() == null)
+        if(getConfig() == null)
         {
             log.severe("[Homes] You have to configure me now, reboot the server after you're done!");
             getDataFolder().mkdirs();
