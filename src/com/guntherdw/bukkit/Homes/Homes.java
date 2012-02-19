@@ -66,6 +66,7 @@ public class Homes extends JavaPlugin {
             getConfig().set("database", "databasename");
             getConfig().set("username", "database-username");
             getConfig().set("password", "database-password");
+            this.saveConfig();
         } catch (Throwable e)
         {
             log.severe("[Homes] There was an exception while we were saving the config, be sure to doublecheck!");
